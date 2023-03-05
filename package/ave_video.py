@@ -27,4 +27,4 @@ def ave(dir):
     cv2.imwrite(dir + "/ave_color.jpg", base_color)
 
 if __name__ == "__main__":
-    ave("result_split")
+    ave("result_2023-02-27-11-49/result_split")

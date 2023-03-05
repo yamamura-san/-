@@ -1,6 +1,7 @@
 import cv2
 import datetime
 import os
+import numpy as np
 
 # 分割する動画名、動画の格納先、分割フレーム数の指定
 def split(file, folder, num):
@@ -24,8 +25,7 @@ def split(file, folder, num):
         # fps分だけ分割
         if i < num:
             gray_frame=cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            ret, gray_frame_binary = cv2.threshold(gray_frame, 50, 255, cv2.THRESH_BINARY)
-            cv2.imwrite(output+'/img_'+str(i)+'.jpg', gray_frame_binary)
+            cv2.imwrite(output+'/img_'+str(i)+'.jpg', gray_frame)
             i +=1
         # 動画が読み込めなくなったらループ終了
         else:
