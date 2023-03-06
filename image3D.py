@@ -67,10 +67,9 @@ def stack_slice(folder):
     print("フォルダ内の画像は{}枚です".format(i))
 
     # Processing stacks of images
-    s = 0
-    for s in range(i):
+    for s in range(1, i+1):
         # Open image convertiung it to grayscale
-        source = Image.open(folder + '/img_' + str(s) + '.jpg', 'r').convert('L')
+        source = Image.open(folder + '/img_' + str(s-1) + '.jpg', 'r').convert('L')
         # Convert image to array
         m = np.array(source, dtype=np.uint8) 
         # Fill empty array with image
