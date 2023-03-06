@@ -2,6 +2,8 @@ from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
+import cv2
+from skimage import io
 
 def stack(folder, step):
 
@@ -27,15 +29,12 @@ def stack(folder, step):
         s = s+1
 
     # Threshold processing and dimensions are unified in mm
-    thresh = 40
+    thresh = 50
     x, y, z= (np.where(stacked > thresh))
-    x = x * 0.02148
-    y = y * 0.02148
-    z = z * step
+    x = x
+    y = y
+    z = z
     v = stacked[np.where(stacked> thresh)]
-
-
-    print(stacked.T.shape)
 
     fig = plt.figure()
 
@@ -55,5 +54,39 @@ def stack(folder, step):
 
     plt.show()
 
+def stack_slice(folder):
+
+    # Extract images from a specified folder
+    imgs = folder+"/*jpg"
+    imgs_list = glob.glob(imgs)
+
+    # Define number of stacks and create empty array
+    i = len(imgs_list)
+    size_image = Image.open(folder + '/img_0.jpg', 'r')
+    stacked = np.ndarray(shape=(size_image.size[1], size_image.size[0], 1200), dtype= np.uint8)
+    print("フォルダ内の画像は{}枚です".format(i))
+
+    # Processing stacks of images
+    s = 0
+    for s in range(i):
+        # Open image convertiung it to grayscale
+        source = Image.open(folder + '/img_' + str(s) + '.jpg', 'r').convert('L')
+        # Convert image to array
+        m = np.array(source, dtype=np.uint8) 
+        # Fill empty array with image
+        stacked[:, :, s*240] = m
+        s = s+1
+
+        # Change the direction of slicing
+
+        img_tmp = np.empty((1920, 1200), dtype = int)
+        for j in range(size_image.size[1]):
+            img_tmp = stacked[j, :, :]
+            io.imsave("result/img_" + str(j) + ".jpg", img_tmp)
+
+            i += 1
+
+
 if __name__ == "__main__":
-    stack("stack_source", 5)
+    #stack("stack_source", 5)
+    stack_slice("stack_source")
