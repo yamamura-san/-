@@ -12,6 +12,14 @@ def main():
     cap(videotime, exposuretime, fps, gain, x_min, x_max, y_min, y_max)
 
 
+# call back fun1
+def value1(x):
+    print("露光時間は{0} umに設定しています".format(x))
+
+# call back fun1
+def value2(y):
+    print("ゲインは{0}に設定しています".format(y))
+
 def setting():
 
     # iniファイル読み込み
@@ -104,18 +112,28 @@ def cap(videotime, exposuretime, fps, gain, x_min, x_max, y_min, y_max):
     # カメラの設定変更のためにdelayさせる
     time.sleep(1)
 
+    # トラックバー作成
+    cv2.namedWindow("title",cv2.WINDOW_NORMAL)
+    cv2.createTrackbar("Expotime", "title", exposuretime, 10000, value1)
+    cv2.createTrackbar("Gain", "title", gain, 40, value1)
+
     i=0
     while camera.IsGrabbing():
         grabResult = camera.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
 
         if grabResult.GrabSucceeded():
             # Access the image data
+
+            expo_act = cv2.getTrackbarPos("Expotime", "title")
+            camera.ExposureTime.SetValue(expo_act)
+
+            gain_act = cv2.getTrackbarPos("Gain", "title")
+            camera.Gain.SetValue(gain_act)
+
             image = converter.Convert(grabResult)
             img = image.GetArray()
             gray_frame_trim= img[y_min : y_max, x_min : x_max]
             ret, gray_frame_trim_binary = cv2.threshold(gray_frame_trim, 50, 255, cv2.THRESH_BINARY)
-            #gray_frame_trim_binary = cv2.resize(gray_frame_trim_binary,(x_max-x_min, y_max-y_min))
-            #cv2.namedWindow('title', cv2.WINDOW_NORMAL)
             cv2.imshow('title', gray_frame_trim_binary)
             k = cv2.waitKey(1)
             if k == 27:
@@ -125,6 +143,8 @@ def cap(videotime, exposuretime, fps, gain, x_min, x_max, y_min, y_max):
     # Releasing the resource
     camera.StopGrabbing()
     cv2.destroyAllWindows()
+
+    print("露光時間は{0}, ゲインは{1}です".format(expo_act, gain_act))
 
 if __name__ == "__main__":
     main()
